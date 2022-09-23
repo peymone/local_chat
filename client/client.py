@@ -1,4 +1,4 @@
-import sys
+import time
 import socket
 import threading
 
@@ -30,8 +30,11 @@ class Client:
 
     def write_message(self):
         while True:
-            message = input()
-            self.client.send(message.encode('utf-8'))
+            try:
+                message = input()
+                self.client.send(message.encode('utf-8'))
+            except:
+                break
 
 
 client = Client('localhost', 55555)

@@ -46,7 +46,7 @@ class Server:
                 target=self.recieve_messages, args=(communication_socket, nickname))
             thread.start()
 
-            print(f"{address} was connectet with nickname: {nickname}")
+            print(f"{address} was connected with nickname: {nickname}")
 
 
 server = Server('localhost', 55555)
