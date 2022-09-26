@@ -1,12 +1,12 @@
 from security import Security
 import threading
 import socket
+import time
 import sys
 
 
 class Server:
     def __init__(self, host, port) -> None:
-        # self.host = socket.gethostbyname(socket.gethostname())
         self.host = host
         self.port = port
         self.clients = {}
@@ -17,11 +17,11 @@ class Server:
         self.server.listen()
 
         if self.host == 'localhost':
-            print(f"Server is running in test mode! {host}:{port}")
-            print(f"current master key: {security.master_key}")
+            print(f"server is running in test mode! {host}:{port}")
+            print(f"master key: {security.master_key}, time: {time.asctime()}")
         else:
-            print(f"Server is running in test mode! {host}:{port}")
-            print(f"current master key: {security.master_key}")
+            print(f"server is running in test mode! {host}:{port}")
+            print(f"master key: {security.master_key}, time: {time.asctime()}")
 
     def broadcast(self, message, nickname):
         for nick, client_socket in self.clients.items():
@@ -68,7 +68,8 @@ class Server:
 
 if len(sys.argv) > 1:
     security = Security()
-    security.generate_key()
+    security_thread = threading.Thread(target=security.auto_generate_key)
+    security_thread.start()
 
     host = socket.gethostbyname(socket.gethostname())
     server = Server(host, sys.argv[1])
