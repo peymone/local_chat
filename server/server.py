@@ -1,5 +1,7 @@
-import socket
+from security import Security
 import threading
+import socket
+import sys
 
 
 class Server:
@@ -14,7 +16,12 @@ class Server:
         self.server.bind((self.host, self.port))
         self.server.listen()
 
-        print("Server is running!")
+        if self.host == 'localhost':
+            print(f"Server is running in test mode! {host}:{port}")
+            print(f"current master key: {security.master_key}")
+        else:
+            print(f"Server is running in test mode! {host}:{port}")
+            print(f"current master key: {security.master_key}")
 
     def broadcast(self, message, nickname):
         for nick, client_socket in self.clients.items():
@@ -37,17 +44,36 @@ class Server:
 
     def recieve_connections(self):
         """Waiting for connetcions and recieve first messages"""
+
         while True:
             communication_socket, address = self.server.accept()
-            nickname = communication_socket.recv(1024).decode('utf-8')
-            self.clients[nickname] = communication_socket
+            buffer = communication_socket.recv(1024).decode('utf-8')
+            master_key = buffer.split('>|<')[0]
+            nickname = buffer.split('>|<')[1]
 
-            thread = threading.Thread(
-                target=self.recieve_messages, args=(communication_socket, nickname))
-            thread.start()
+            print(f"{address} trying to connect with nickname: {nickname}")
+            if security.key_validation(master_key) == True:
+                self.clients[nickname] = communication_socket
 
-            print(f"{address} was connected with nickname: {nickname}")
+                thread = threading.Thread(
+                    target=self.recieve_messages, args=(communication_socket, nickname))
+                thread.start()
+
+                print(f"{address} was connected with nickname: {nickname}")
+            else:
+                print(f"{nickname} entered incorrect master key")
+                communication_socket.send('close'.encode('utf-8'))
+                communication_socket.close()
 
 
-server = Server('localhost', 55555)
+if len(sys.argv) > 1:
+    security = Security()
+    security.generate_key()
+
+    host = socket.gethostbyname(socket.gethostname())
+    server = Server(host, sys.argv[1])
+else:
+    security = Security()
+    server = Server('localhost', 55555)
+
 server.recieve_connections()
