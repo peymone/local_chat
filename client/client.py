@@ -18,6 +18,9 @@ class Client:
         self.client.send(f"{security.access_key}>|<".encode())
         self.client.send(self.nickname.encode())
 
+        if self.host == 'localhost':
+            print(f"client is running in test mode! {host}:{port}")
+
     def recieve_message(self):
         while True:
             try:
