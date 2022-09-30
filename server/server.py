@@ -24,6 +24,11 @@ class Server:
         print(
             f"access key: {security.access_key}, offset: {security.offset}, time: {time.asctime()}")
 
+    def admin_panel(self):
+        while True:
+            command = input()
+            self.broadcast(command, 'Admin')
+
     def broadcast(self, message: str, nickname: str) -> None:
         for nick, client_socket in self.clients.items():
             if nick == nickname:
@@ -74,4 +79,6 @@ if len(sys.argv) > 1:
 else:
     server = Server('localhost', 55555)
 
+admin_thread = threading.Thread(target=server.admin_panel)
+admin_thread.start()
 server.recieve_connections()
