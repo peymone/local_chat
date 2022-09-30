@@ -41,6 +41,7 @@ class Server:
             try:
                 message = security.decrypt(client_socket.recv(1024))
                 self.broadcast(message, nickname)
+                print(f"{nickname}: {message}")
             except:
                 del self.clients[nickname]
                 client_socket.close()
