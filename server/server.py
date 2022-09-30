@@ -1,10 +1,12 @@
-import socket
+from security import security
 import threading
+import socket
+import time
+import sys
 
 
 class Server:
     def __init__(self, host, port) -> None:
-        # self.host = socket.gethostbyname(socket.gethostname())
         self.host = host
         self.port = port
         self.clients = {}
@@ -14,19 +16,25 @@ class Server:
         self.server.bind((self.host, self.port))
         self.server.listen()
 
-        print("Server is running!")
+        if self.host == 'localhost':
+            print(f"server is running in test mode! {host}:{port}")
+        else:
+            print(f"server is running in test mode! {host}:{port}")
 
-    def broadcast(self, message, nickname):
+        print(
+            f"access key: {security.access_key}, offset: {security.offset}, time: {time.asctime()}")
+
+    def broadcast(self, message: str, nickname: str) -> None:
         for nick, client_socket in self.clients.items():
             if nick == nickname:
                 continue
 
-            client_socket.send(f"{nickname}: {message}".encode('utf-8'))
+            client_socket.send(security.encrypt(f"{nickname}: {message}"))
 
-    def recieve_messages(self, client_socket, nickname):
+    def recieve_messages(self, client_socket: socket, nickname: str) -> None:
         while True:
             try:
-                message = client_socket.recv(1024).decode('utf-8')
+                message = security.decrypt(client_socket.recv(1024))
                 self.broadcast(message, nickname)
             except:
                 del self.clients[nickname]
@@ -37,17 +45,33 @@ class Server:
 
     def recieve_connections(self):
         """Waiting for connetcions and recieve first messages"""
+
         while True:
             communication_socket, address = self.server.accept()
-            nickname = communication_socket.recv(1024).decode('utf-8')
-            self.clients[nickname] = communication_socket
+            buffer = communication_socket.recv(1024).decode()
+            access_key = buffer.split('>|<')[0]
+            nickname = buffer.split('>|<')[1]
 
-            thread = threading.Thread(
-                target=self.recieve_messages, args=(communication_socket, nickname))
-            thread.start()
+            print(f"{address} trying to connect with nickname: {nickname}")
+            if security.verify_key(access_key) == True:
+                self.clients[nickname] = communication_socket
+                communication_socket.send(f"PK{security.public_key}".encode())
 
-            print(f"{address} was connected with nickname: {nickname}")
+                thread = threading.Thread(
+                    target=self.recieve_messages, args=(communication_socket, nickname))
+                thread.start()
+
+                print(f"{address} was connected with nickname: {nickname}")
+            else:
+                print(f"{nickname} entered incorrect access key")
+                communication_socket.send('close connection'.encode())
+                communication_socket.close()
 
 
-server = Server('localhost', 55555)
+if len(sys.argv) > 1:
+    host = socket.gethostbyname(socket.gethostname())
+    server = Server(host, int(sys.argv[1]))
+else:
+    server = Server('localhost', 55555)
+
 server.recieve_connections()
