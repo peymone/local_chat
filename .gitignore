@@ -1,2 +1,4 @@
 server/__pycache__/
 client/__pycache__/
+
+server/banned_clients.txt

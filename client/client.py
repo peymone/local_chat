@@ -18,8 +18,7 @@ class Client:
         self.client.send(f"{security.access_key}>|<".encode())
         self.client.send(self.nickname.encode())
 
-        if self.server_host == 'localhost':
-            print(f"client is running in test mode! {host}:{port}")
+        print(f"client started on {host}:{port}")
 
     def recieve_message(self):
         while True:
@@ -28,13 +27,16 @@ class Client:
                 if message.decode()[:2] == 'PK':
                     security.initialize_fernet(message.decode()[2:])
                     continue
+                elif message.decode()[:6] == 'banned':
+                    print(f"you are banned for: {message.decode()[6:]}")
+                    break
                 elif message.decode() == 'close connection':
-                    print("entered incorrect master key")
+                    print("entered incorrect access key")
                     break
 
                 print(security.decrypt(message))
             except:
-                print("server has stopped")
+                print("server has stopped or you have been banned")
                 self.client.close()
                 break
 
