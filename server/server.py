@@ -33,6 +33,20 @@ class Server:
                             print(nickname, address[1])
                     continue
 
+                if command == "-banned":
+                    with open('banned_clients.txt', 'r') as file:
+                        lines = file.readlines()
+
+                        if len(lines) == 0:
+                            print("No banned clients")
+                        else:
+                            for line in lines:
+                                print(line.strip().replace(
+                                    '|', " banned until "))
+
+                            print(f"total banned: {len(lines)}")
+                        continue
+
                 if command.split()[0] == "-ban":
                     nick = command.split()[1]
                     host = self.clients[nick][1][0]
