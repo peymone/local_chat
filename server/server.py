@@ -78,7 +78,7 @@ class Server:
 
     def recieve_messages(self, client_socket: socket, nickname: str) -> None:
         while True:
-            ban, time_ban = self.check_ban(self.clients[nickname][1])
+            ban, tBan = self.check_ban(self.clients[nickname][1])
 
             if ban is True:
                 del self.clients[nickname]
@@ -106,11 +106,11 @@ class Server:
             nickname = buffer.split('>|<')[1]
 
             print(f"{address} trying to connect with nickname: {nickname}")
-            ban, time_ban = self.check_ban(address)
+            ban, tBan = self.check_ban(address)
 
             if ban is True:
-                communication_socket.send(f"banned {time_ban}".encode())
-                print(f"{address} tried to connect with ban until {time_ban}")
+                communication_socket.send(f"banned {tBan}".encode())
+                print(f"{address} tried to connect with ban until {tBan}")
                 continue
 
             if security.verify_key(access_key) is True:
