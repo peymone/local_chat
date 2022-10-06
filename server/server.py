@@ -90,6 +90,8 @@ class Server:
                             with open('banned_clients.txt', 'w') as file:
                                 for line in lines:
                                     file.write(line)
+
+                    print(f"{host} was unbanned")
                     continue
 
                 self.broadcast(command, 'Admin')
