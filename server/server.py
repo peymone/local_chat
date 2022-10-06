@@ -25,7 +25,7 @@ class Server:
             command = input()
 
             try:
-                if command == "-clients":
+                if command == '-clients':
                     if len(self.clients) == 0:
                         print("No connected clients")
                     else:
@@ -33,7 +33,7 @@ class Server:
                             print(nickname, address[1])
                     continue
 
-                if command == "-banned":
+                if command == '-banned':
                     with open('banned_clients.txt', 'r') as file:
                         lines = file.readlines()
 
@@ -47,7 +47,7 @@ class Server:
                             print(f"total banned: {len(lines)}")
                         continue
 
-                if command.split()[0] == "-ban":
+                if command.split()[0] == '-ban':
                     nick = command.split()[1]
                     host = self.clients[nick][1][0]
 
@@ -63,6 +63,19 @@ class Server:
 
                     print(f"{nick} was banned until {tBan}")
                     continue
+
+                if command.split()[0] == '-unban':
+                    host = command.split()[1]
+
+                    with open('banned_clients.txt', 'r') as file:
+                        lines = file.readlines()
+                        for number, line in enumerate(lines):
+                            if host in line:
+                                del lines[number]
+
+                            with open('banned_clients.txt', 'w') as file:
+                                for line in lines:
+                                    file.write(line)
 
                 self.broadcast(command, 'Admin')
 
