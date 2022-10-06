@@ -36,6 +36,8 @@ class Server:
                     for cmd, description in commands.items():
                         print(f"{cmd}: {description}")
 
+                    continue
+
                 if command == '-clients':
                     if len(self.clients) == 0:
                         print("No connected clients")
@@ -72,6 +74,7 @@ class Server:
 
                     self.clients[nick][0].send(f"banned {tBan}".encode())
 
+                    self.broadcast(f"{nick} was banned until {tBan}", 'Admin')
                     print(f"{nick} was banned until {tBan}")
                     continue
 
@@ -87,6 +90,7 @@ class Server:
                             with open('banned_clients.txt', 'w') as file:
                                 for line in lines:
                                     file.write(line)
+                    continue
 
                 self.broadcast(command, 'Admin')
 
@@ -117,6 +121,7 @@ class Server:
                 del self.clients[nickname]
                 client_socket.close()
 
+                self.broadcast(f"{nickname} left the chat", 'Admin')
                 print(f"{nickname} left the chat")
                 break
 
@@ -145,6 +150,7 @@ class Server:
                     target=self.recieve_messages, args=(communication_socket, nickname))
                 thread.start()
 
+                self.broadcast(f"{nickname} connected", 'Admin')
                 print(f"{address} was connected with nickname: {nickname}")
             else:
                 print(f"{nickname} entered incorrect access key")
