@@ -21,10 +21,21 @@ class Server:
         print(security.access_key, security.offset, time.asctime())
 
     def admin_panel(self):
+        commands = {
+            "-clients": "show list of connected clients",
+            "-ban client_nickname [hours]": "ban client permanently or for hours (optional)",
+            "-unban host": "unban client by host",
+            "-banned": "show list of banned clients",
+        }
+
         while True:
             command = input()
 
             try:
+                if command == '-commands' or command == '-help':
+                    for cmd, description in commands.items():
+                        print(f"{cmd}: {description}")
+
                 if command == '-clients':
                     if len(self.clients) == 0:
                         print("No connected clients")
