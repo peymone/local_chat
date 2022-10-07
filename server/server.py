@@ -2,7 +2,6 @@ from datetime import datetime as dt, timedelta as td
 from security import security
 import threading
 import socket
-import time
 import sys
 
 import openpyxl
