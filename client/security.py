@@ -3,8 +3,8 @@ from cryptography.fernet import Fernet
 
 class Security:
     def __init__(self) -> None:
-        self.access_key = input("Enter your access key: ")
-        self.offset = int(input("Enter your offset: "))
+        self.access_key = input("enter your access key: ")
+        self.offset = int(input("enter your offset: "))
         self.private_key = ''
 
     def initialize_fernet(self, public_key: str) -> None:

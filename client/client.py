@@ -8,7 +8,7 @@ class Client:
     def __init__(self, host, port) -> None:
         self.server_host = host
         self.server_port = port
-        self.nickname = input("Choose a nickname: ")
+        self.nickname = input("choose a nickname: ")
 
         # Create a client socket and connect to the server
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,7 +18,7 @@ class Client:
         self.client.send(f"{security.access_key}>|<".encode())
         self.client.send(self.nickname.encode())
 
-        print(f"client started on {host}:{port}")
+        print(f"client started on {host}:{port}\n")
 
     def recieve_message(self):
         while True:

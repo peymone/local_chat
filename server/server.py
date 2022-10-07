@@ -4,6 +4,8 @@ import threading
 import socket
 import sys
 
+from pyfiglet import figlet_format as logo
+from rich.console import Console
 import openpyxl
 
 
@@ -19,11 +21,13 @@ class Server:
         self.server.bind((self.host, self.port))
         self.server.listen()
 
-        print(f"server started on {host}:{port}")
-        print(security.access_key, security.offset, self.tNow)
+        print(logo("CRYPTO LOCAL CHAT", font='larry3d'))
+        print(f"server started on {host}:{port}\t{self.tNow}")
+        print('acess key:', security.access_key)
+        print('offset:', security.offset, '\n')
 
-        self.log(('System', self.tNow, f"server started on {host}:{port}"))
-        self.log(('System', self.tNow,
+        self.log(('system', self.tNow, f"server started on {host}:{port}"))
+        self.log(('system', self.tNow,
                  f"aKey: {security.access_key}, offset: {security.offset}"))
 
     @property
@@ -46,17 +50,17 @@ class Server:
                     for cmd, description in commands.items():
                         print(f"{cmd}: {description}")
 
-                    self.log(('Admin', self.tNow, command))
+                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command == '-clients':
                     if len(self.clients) == 0:
-                        print("No connected clients")
+                        print("no connected clients")
                     else:
                         for nickname, address in self.clients.items():
                             print(nickname, address[1])
 
-                    self.log(('Admin', self.tNow, command))
+                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command == '-banned':
@@ -64,7 +68,7 @@ class Server:
                         lines = file.readlines()
 
                         if len(lines) == 0:
-                            print("No banned clients")
+                            print("no banned clients")
                         else:
                             for line in lines:
                                 print(line.strip().replace(
@@ -72,7 +76,7 @@ class Server:
 
                             print(f"total banned: {len(lines)}")
 
-                    self.log(('Admin', self.tNow, command))
+                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command.split()[0] == '-ban':
@@ -88,10 +92,10 @@ class Server:
                             file.write(f"{host}|{tBan}\n")
 
                     self.clients[nick][0].send(f"banned {tBan}".encode())
-                    self.broadcast(f"{nick} was banned until {tBan}", 'Admin')
+                    self.broadcast(f"{nick} was banned until {tBan}", 'admin')
 
                     print(f"{nick} was banned until {tBan}")
-                    self.log(('Admin', self.tNow, command))
+                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command.split()[0] == '-unban':
@@ -107,12 +111,12 @@ class Server:
                                 for line in lines:
                                     file.write(line)
 
-                    self.log(('Admin', self.tNow, command))
+                    self.log(('admin', self.tNow, command))
                     print(f"{host} was unbanned")
                     continue
 
-                self.log(('Admin', self.tNow, command))
-                self.broadcast(command, 'Admin')
+                self.log(('admin', self.tNow, command))
+                self.broadcast(command, 'admin')
 
             except:
                 continue
@@ -144,8 +148,8 @@ class Server:
                 del self.clients[nickname]
                 client_socket.close()
 
-                self.log(('System', self.tNow, f"{nickname} left the chat"))
-                self.broadcast(f"{nickname} left the chat", 'Admin')
+                self.log(('server', self.tNow, f"{nickname} left the chat"))
+                self.broadcast(f"{nickname} left the chat", 'server')
                 print(f"{nickname} left the chat")
                 break
 
@@ -162,7 +166,7 @@ class Server:
             if ban is True:
                 msg = f"{address} tried to connect with ban until {tBan}"
                 communication_socket.send(f"banned {tBan}".encode())
-                self.log(('System', self.tNow, msg))
+                self.log(('server', self.tNow, msg))
                 print(msg)
 
                 continue
@@ -176,8 +180,8 @@ class Server:
                 thread.start()
 
                 msg = f"{address} was connected with nickname: {nickname}"
-                self.broadcast(f"{nickname} connected", 'Admin')
-                self.log(('System', self.tNow, msg))
+                self.broadcast(f"{nickname} connected", 'server')
+                self.log(('server', self.tNow, msg))
                 print(msg)
 
             else:
@@ -185,7 +189,7 @@ class Server:
                 communication_socket.close()
 
                 msg = f"{nickname} entered incorrect access key"
-                self.log(('Admin', self.tNow, msg))
+                self.log(('server', self.tNow, msg))
                 print(msg)
 
     def check_ban(self, address) -> tuple:
