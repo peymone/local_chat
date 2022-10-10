@@ -144,7 +144,6 @@ class Server:
                 self.broadcast(message, nickname)
 
                 ui.show_msg(f"{nickname}: {message}")
-                # print(f"{nickname}: {message}")
 
             except:
                 del self.clients[nickname]
@@ -153,7 +152,6 @@ class Server:
                 self.log(('server', self.tNow, f"{nickname} left the chat"))
                 self.broadcast(f"[sys]{nickname} left the chat", 'server')
                 ui.show_msg(f"[sys]{nickname} left the chat")
-                # print(f"{nickname} left the chat")
                 break
 
     def recieve_connections(self):
@@ -175,6 +173,9 @@ class Server:
                 continue
 
             if security.verify_key(access_key) is True:
+                if 'admin' in nickname.lower():
+                    nickname = str('cheatting_shit')
+
                 self.clients[nickname] = (communication_socket, address)
                 communication_socket.send(f"PK{security.public_key}".encode())
 
