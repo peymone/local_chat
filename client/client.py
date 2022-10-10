@@ -1,6 +1,7 @@
 import sys
 import socket
 import threading
+from interface import ui
 from security import security
 
 
@@ -8,7 +9,7 @@ class Client:
     def __init__(self, host, port) -> None:
         self.server_host = host
         self.server_port = port
-        self.nickname = input("Choose a nickname: ")
+        self.nickname = input("choose a nickname: ")
 
         # Create a client socket and connect to the server
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,7 +19,8 @@ class Client:
         self.client.send(f"{security.access_key}>|<".encode())
         self.client.send(self.nickname.encode())
 
-        print(f"client started on {host}:{port}")
+        ui.show_logo()
+        ui.show_msg(f"[sys]client started on[/sys] {host}:{port}\n")
 
     def recieve_message(self):
         while True:
@@ -28,15 +30,16 @@ class Client:
                     security.initialize_fernet(message.decode()[2:])
                     continue
                 elif message.decode()[:6] == 'banned':
-                    print(f"you are banned for: {message.decode()[6:]}")
+                    ui.show_msg(
+                        f"[sys]you are banned for:[/sys] {message.decode()[6:]}")
                     break
                 elif message.decode() == 'close connection':
-                    print("entered incorrect access key")
+                    ui.show_msg("[sys]entered incorrect access key")
                     break
 
-                print(security.decrypt(message))
+                ui.show_msg(security.decrypt(message))
             except:
-                print("server has stopped or you have been banned")
+                ui.show_msg("[sys]server has stopped or you have been banned")
                 self.client.close()
                 break
 
@@ -44,7 +47,7 @@ class Client:
         while True:
             try:
                 message = input()
-                self.client.send(security.encrypt(message))
+                self.client.send(security.encrypt('[clt]' + message))
             except:
                 break
 

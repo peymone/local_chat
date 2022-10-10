@@ -1,5 +1,6 @@
 from datetime import datetime as dt, timedelta as td
 from security import security
+from interface import ui
 import threading
 import socket
 import sys
@@ -19,11 +20,13 @@ class Server:
         self.server.bind((self.host, self.port))
         self.server.listen()
 
-        print(f"server started on {host}:{port}")
-        print(security.access_key, security.offset, self.tNow)
+        ui.show_logo()
+        ui.show_msg(f"[sys]server started on[/sys] {host}: {port}")
+        ui.show_msg(f"[sys]acess key:[/sys] {security.access_key}")
+        ui.show_msg(f"[sys]offset:[/sys] {security.offset}\n")
 
-        self.log(('System', self.tNow, f"server started on {host}:{port}"))
-        self.log(('System', self.tNow,
+        self.log(('server', self.tNow, f"server started on {host}:{port}"))
+        self.log(('server', self.tNow,
                  f"aKey: {security.access_key}, offset: {security.offset}"))
 
     @property
@@ -44,19 +47,19 @@ class Server:
             try:
                 if command == '-commands' or command == '-help':
                     for cmd, description in commands.items():
-                        print(f"{cmd}: {description}")
+                        ui.show_msg(f"[adm]{cmd}: {description}")
 
-                    self.log(('Admin', self.tNow, command))
+                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command == '-clients':
                     if len(self.clients) == 0:
-                        print("No connected clients")
+                        ui.show_msg("[adm]no connected clients")
                     else:
                         for nickname, address in self.clients.items():
-                            print(nickname, address[1])
+                            ui.show_msg(f"[adm]{nickname} {address[1]}")
 
-                    self.log(('Admin', self.tNow, command))
+                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command == '-banned':
@@ -64,15 +67,15 @@ class Server:
                         lines = file.readlines()
 
                         if len(lines) == 0:
-                            print("No banned clients")
+                            ui.show_msg("[adm]no banned clients")
                         else:
                             for line in lines:
-                                print(line.strip().replace(
-                                    '|', " banned until "))
+                                ui.show_msg(
+                                    '[adm]' + line.strip().replace('|', " banned until "))
 
-                            print(f"total banned: {len(lines)}")
+                            ui.show_msg(f"[adm]total banned: {len(lines)}")
 
-                    self.log(('Admin', self.tNow, command))
+                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command.split()[0] == '-ban':
@@ -88,10 +91,11 @@ class Server:
                             file.write(f"{host}|{tBan}\n")
 
                     self.clients[nick][0].send(f"banned {tBan}".encode())
-                    self.broadcast(f"{nick} was banned until {tBan}", 'Admin')
+                    self.broadcast(
+                        f"[adm]{nick} was banned until[/adm] {tBan}", 'admin')
 
-                    print(f"{nick} was banned until {tBan}")
-                    self.log(('Admin', self.tNow, command))
+                    ui.show_msg(f"[adm]{nick} was banned until[/adm] {tBan}")
+                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command.split()[0] == '-unban':
@@ -107,12 +111,13 @@ class Server:
                                 for line in lines:
                                     file.write(line)
 
-                    self.log(('Admin', self.tNow, command))
-                    print(f"{host} was unbanned")
+                    ui.show_msg(f"[adm]{host} was unbanned")
+                    self.log(('admin', self.tNow, command))
+
                     continue
 
-                self.log(('Admin', self.tNow, command))
-                self.broadcast(command, 'Admin')
+                self.log(('admin', self.tNow, command))
+                self.broadcast('[adm]' + command, 'admin')
 
             except:
                 continue
@@ -135,18 +140,20 @@ class Server:
 
             try:
                 message = security.decrypt(client_socket.recv(1024))
-                self.log((nickname, self.tNow, message))
+                self.log((nickname, self.tNow, message[5:]))
                 self.broadcast(message, nickname)
 
-                print(f"{nickname}: {message}")
+                ui.show_msg(f"{nickname}: {message}")
+                # print(f"{nickname}: {message}")
 
             except:
                 del self.clients[nickname]
                 client_socket.close()
 
-                self.log(('System', self.tNow, f"{nickname} left the chat"))
-                self.broadcast(f"{nickname} left the chat", 'Admin')
-                print(f"{nickname} left the chat")
+                self.log(('server', self.tNow, f"{nickname} left the chat"))
+                self.broadcast(f"[sys]{nickname} left the chat", 'server')
+                ui.show_msg(f"[sys]{nickname} left the chat")
+                # print(f"{nickname} left the chat")
                 break
 
     def recieve_connections(self):
@@ -162,9 +169,9 @@ class Server:
             if ban is True:
                 msg = f"{address} tried to connect with ban until {tBan}"
                 communication_socket.send(f"banned {tBan}".encode())
-                self.log(('System', self.tNow, msg))
-                print(msg)
+                self.log(('server', self.tNow, msg))
 
+                ui.show_msg('[sys]' + msg)
                 continue
 
             if security.verify_key(access_key) is True:
@@ -176,17 +183,17 @@ class Server:
                 thread.start()
 
                 msg = f"{address} was connected with nickname: {nickname}"
-                self.broadcast(f"{nickname} connected", 'Admin')
-                self.log(('System', self.tNow, msg))
-                print(msg)
+                self.broadcast(f"[sys]{nickname} connected", 'server')
+                self.log(('server', self.tNow, msg))
+                ui.show_msg('[sys]' + msg)
 
             else:
                 communication_socket.send('close connection'.encode())
                 communication_socket.close()
 
                 msg = f"{nickname} entered incorrect access key"
-                self.log(('Admin', self.tNow, msg))
-                print(msg)
+                self.log(('server', self.tNow, msg))
+                ui.show_msg('[sys]' + msg)
 
     def check_ban(self, address) -> tuple:
         with open('banned_clients.txt', 'r') as file:
