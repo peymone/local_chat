@@ -53,7 +53,7 @@ class Client:
 
 
 if len(sys.argv) > 1:
-    client = Client(int(sys.argv[1]), int(sys.argv[2]))
+    client = Client(sys.argv[1], int(sys.argv[2]))
 else:
     client = Client('localhost', 55555)
 
