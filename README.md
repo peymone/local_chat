@@ -7,7 +7,7 @@ Istallation instruction:
 Program launch for server
 
 1 Open terminal in your role directory
-2 Type "python server [port]"
+2 Type "python server.py [port]"
 3 Share data with the client: ip and port, acess_key and offset
 4 Type -help for show all available commands
 5 Type anything else for broadcast to clients
@@ -15,7 +15,7 @@ Program launch for server
 Program launch for client 
 
 1 Open terminal in your role directory
-2 Type "python [server_ip] [server_port]"
+2 Type "python client.py [server_ip] [server_port]"
 3 Follow the program instruction
 
 Good night and good luck! xD
