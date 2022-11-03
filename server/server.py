@@ -40,6 +40,7 @@ class Server:
             "-ban client_nickname [hours]": "ban client permanently or for hours (optional)",
             "-unban host": "unban client by host",
             "-banned": "show list of banned clients",
+            "-server": "show info about server for sharing with clients",
         }
 
         while True:
@@ -59,6 +60,14 @@ class Server:
                     else:
                         for nickname, address in self.clients.items():
                             ui.show_msg(f"[adm]{nickname} {address[1]}")
+
+                    continue
+
+                if command == '-server':
+                    ui.show_msg(
+                        f"[adm]server running on[/adm]: {self.host}: {self.port}")
+                    ui.show_msg(f"[adm]acess key:[/adm] {security.access_key}")
+                    ui.show_msg(f"[adm]offset:[/adm] {security.offset}\n")
 
                     continue
 
