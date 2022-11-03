@@ -16,10 +16,6 @@ class Client:
         self.client.connect((self.server_host, self.server_port))
 
         # Send first messages with access key and nickname
-
-        # self.client.send(f"{security.access_key}>|<".encode())
-        # self.client.send(self.nickname.encode())
-
         self.client.send(security.access_key.encode())
         self.client.send(self.nickname.encode())
 

@@ -154,10 +154,6 @@ class Server:
 
         while True:
             communication_socket, address = self.server.accept()
-            # buffer = communication_socket.recv(1024).decode()
-            # access_key = buffer.split('>|<')[0]
-            # nickname = buffer.split('>|<')[1]
-
             access_key = communication_socket.recv(1024).decode()
             nickname = communication_socket.recv(1024).decode()
 
@@ -190,7 +186,7 @@ class Server:
                 communication_socket.send('close connection'.encode())
                 communication_socket.close()
 
-                msg = f"{nickname} entered incorrect access key"
+                msg = f"{address} {nickname} entered incorrect access key"
                 self.log(('server', self.tNow, msg))
                 ui.show_msg('[sys]' + msg)
 
