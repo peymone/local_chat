@@ -5,6 +5,7 @@ import random
 class Security:
     def __init__(self) -> None:
         """pass offset and acess key verbally, public key programmatically"""
+
         self.private_key = Fernet.generate_key().decode()
         self.offset = random.randint(0, len(self.private_key) - 5)
         self.access_key = self.private_key[self.offset: self.offset + 5]

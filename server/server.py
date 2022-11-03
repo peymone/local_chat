@@ -24,6 +24,7 @@ class Server:
         ui.show_msg(f"[sys]server started on[/sys] {host}: {port}")
         ui.show_msg(f"[sys]acess key:[/sys] {security.access_key}")
         ui.show_msg(f"[sys]offset:[/sys] {security.offset}\n")
+        ui.show_msg("type [sys]'-help'[/sys] to see a list of commands\n")
 
         self.log(('server', self.tNow, f"server started on {host}:{port}"))
         self.log(('server', self.tNow,
@@ -43,13 +44,13 @@ class Server:
 
         while True:
             command = input()
+            self.log(('admin', self.tNow, command))
 
             try:
                 if command == '-commands' or command == '-help':
                     for cmd, description in commands.items():
                         ui.show_msg(f"[adm]{cmd}: {description}")
 
-                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command == '-clients':
@@ -59,7 +60,6 @@ class Server:
                         for nickname, address in self.clients.items():
                             ui.show_msg(f"[adm]{nickname} {address[1]}")
 
-                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command == '-banned':
@@ -75,7 +75,6 @@ class Server:
 
                             ui.show_msg(f"[adm]total banned: {len(lines)}")
 
-                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command.split()[0] == '-ban':
@@ -95,7 +94,6 @@ class Server:
                         f"[adm]{nick} was banned until[/adm] {tBan}", 'admin')
 
                     ui.show_msg(f"[adm]{nick} was banned until[/adm] {tBan}")
-                    self.log(('admin', self.tNow, command))
                     continue
 
                 if command.split()[0] == '-unban':
@@ -112,11 +110,8 @@ class Server:
                                     file.write(line)
 
                     ui.show_msg(f"[adm]{host} was unbanned")
-                    self.log(('admin', self.tNow, command))
-
                     continue
 
-                self.log(('admin', self.tNow, command))
                 self.broadcast('[adm]' + command, 'admin')
 
             except:
@@ -159,9 +154,12 @@ class Server:
 
         while True:
             communication_socket, address = self.server.accept()
-            buffer = communication_socket.recv(1024).decode()
-            access_key = buffer.split('>|<')[0]
-            nickname = buffer.split('>|<')[1]
+            # buffer = communication_socket.recv(1024).decode()
+            # access_key = buffer.split('>|<')[0]
+            # nickname = buffer.split('>|<')[1]
+
+            access_key = communication_socket.recv(1024).decode()
+            nickname = communication_socket.recv(1024).decode()
 
             ban, tBan = self.check_ban(address)
             if ban is True:
