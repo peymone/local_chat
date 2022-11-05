@@ -29,6 +29,11 @@ class Server:
         self.log(('server', self.tNow, f"server started on {host}:{port}"))
         self.log(('server', self.tNow,
                  f"aKey: {security.access_key}, offset: {security.offset}"))
+        try:
+            with open('banned_clients.txt', 'x') as file:
+                pass
+        except FileExistsError:
+            pass
 
     @property
     def tNow(self):
