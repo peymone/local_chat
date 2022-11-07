@@ -14,12 +14,12 @@
     <img src="https://img.shields.io/github/downloads/peymone/local_chat/total?style=social" alt="Downloads">
 </p>
 
-##About
+<h2>About</h2>
 
 _This local chat allows you to send secure messages, using symmetric encryption, to users on the same local network. For the application to work, you need to start the server and transfer the data necessary for connection through a secure source to prevent interception of the first insecure messages._
 
 ---
-##Istallation
+<h2>Istallation</h2>
 
 1. _Remove everything from the project except the role you are interested in: server or client_
 2. _Install python from [offisial site](https://www.python.org/downloads/)_
@@ -27,7 +27,7 @@ _This local chat allows you to send secure messages, using symmetric encryption,
 
 ---
 
-###Program launch for server:
+<h3>Program launch for server:</h3>
 
 * _Open terminal in your role directory (cd path/server)_
 * _Type `python server.py [port]`_
@@ -35,7 +35,7 @@ _This local chat allows you to send secure messages, using symmetric encryption,
 * _Type `-help` for show all available commands_
 * _Type anything else for broadcast to clients_
 
-###Program launch for client:
+<h3>Program launch for client:</h3>
 
 * _Open terminal in your role directory (cd path/client)_
 * _Type `python client.py [server_ip] [server_port]`_
